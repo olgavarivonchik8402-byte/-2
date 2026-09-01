@@ -88,6 +88,34 @@ body{
 .screen{ display:none; flex:1; flex-direction:column; animation:rise 0.5s ease both; }
 .screen.active{ display:flex; }
 
+/* ---------- TABLET / LARGER SCREENS ---------- */
+@media (min-width:640px){
+  #app{
+    max-width:600px;
+    padding:36px 32px 110px;
+  }
+  .title-main{ font-size:76px; }
+  .subtitle{ font-size:16.5px; max-width:380px; }
+  .task-title{ font-size:32px; }
+  .task-body{ font-size:16.5px; }
+  .card{ padding:30px 26px; }
+  .btn{ font-size:17px; padding:17px 30px; }
+  .name-row, .btn-primary, .btn-ghost{ max-width:340px; }
+  .pad-grid{ max-width:360px; margin-left:auto; margin-right:auto; }
+  .pad{ height:92px; }
+  .puzzle-wrap{ max-width:520px; margin-left:auto; margin-right:auto; }
+  .rhythm-pattern{ font-size:42px; }
+  .footbar{ padding:20px 20px 26px; }
+}
+
+/* ---------- SHORT / LANDSCAPE VIEWPORTS ---------- */
+@media (max-height:560px) and (orientation:landscape){
+  #app{ padding-top:16px; padding-bottom:80px; }
+  .hero-scene{ display:none; }
+  .title-main{ font-size:44px; }
+  .footbar{ padding:10px 20px 14px; }
+}
+
 @keyframes rise{
   from{ opacity:0; transform:translateY(16px); }
   to{ opacity:1; transform:translateY(0); }
@@ -121,6 +149,26 @@ body{
   border:1px solid rgba(255,216,115,0.18);
   border-radius:22px;
   padding:22px 18px 26px;
+}
+#screen-intro-video{
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  margin:-24px -20px 0;
+  padding:24px 20px;
+  background:var(--bg);
+}
+.intro-video-wrap{
+  width:100%;
+  max-width:340px;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid rgba(255,216,115,0.25);
+  box-shadow:0 0 30px rgba(217,164,65,0.2);
+}
+.intro-video-wrap video{
+  width:100%;
+  display:block;
 }
 .kicker{
   color:var(--gold);
@@ -560,6 +608,14 @@ body{
     </div>
   </section>
 
+  <!-- INTRO VIDEO (plays after name entry, before first task) -->
+  <section class="screen" id="screen-intro-video">
+    <div class="intro-video-wrap">
+      <video id="introVideo" src="intro-video.mp4" playsinline controls autoplay></video>
+    </div>
+    <button class="btn btn-primary" onclick="proceedToQuest()" style="margin:18px auto 0;">Далее →</button>
+  </section>
+
   <!-- QUEST SCREEN (shared template, content injected by JS) -->
   <section class="screen" id="screen-task">
     <div class="topbar">
@@ -742,6 +798,12 @@ let kidName = "Звезда";
 function startQuest(){
   const val = document.getElementById('kidName').value.trim();
   if(val) kidName = val;
+  showScreen('screen-intro-video');
+}
+
+function proceedToQuest(){
+  const video = document.getElementById('introVideo');
+  video.pause();
   buildFootbar();
   nextTask();
 }
