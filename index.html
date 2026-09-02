@@ -725,7 +725,7 @@ const tasks = [
     title: "Угадай мультфильм",
     body: "Под плитками спрятался кадр из мультфильма. Каждый ребёнок по очереди открывает одну плитку. Как только догадаешься, что это за мультфильм, сразу же напиши ответ ниже, не жди, пока откроются все плитки!",
     type: "puzzle",
-    image: "cartoon-puzzle.jpg",
+    image: "cartoon-puzzle",
     answer: "ну погоди"
   },
   {
@@ -879,13 +879,36 @@ function completeTask(){
 }
 
 /* ---- Обложка задания: cover-N.jpg (или .png/.mp4), кладёшь рядом с квестом ---- */
+/* Пробует .jpg, затем .png, затем .jpeg — на случай разных расширений на GitHub */
+function loadImageWithFallback(img, baseName, onFound, onFail){
+  const exts = ['jpg','png','jpeg'];
+  let i = 0;
+  function tryNext(){
+    if(i >= exts.length){ if(onFail) onFail(); return; }
+    img.onload = ()=>{ if(onFound) onFound(); };
+    img.onerror = ()=>{ i++; tryNext(); };
+    img.src = baseName + '.' + exts[i];
+  }
+  tryNext();
+}
+
+/* То же самое, но для CSS background-image (пробует расширения через скрытый Image) */
+function loadBackgroundWithFallback(el, baseName){
+  const probe = new Image();
+  loadImageWithFallback(probe, baseName,
+    ()=>{ el.style.backgroundImage = `url('${probe.src}')`; },
+    ()=>{}
+  );
+}
+
 function loadTaskCover(n){
   const wrap = document.getElementById('taskCover');
   const img = document.getElementById('taskCoverImg');
   wrap.classList.remove('has-media');
-  img.onload = ()=>{ wrap.classList.add('has-media'); };
-  img.onerror = ()=>{ wrap.classList.remove('has-media'); };
-  img.src = 'cover-' + n + '.jpg';
+  loadImageWithFallback(img, 'cover-' + n,
+    ()=>{ wrap.classList.add('has-media'); },
+    ()=>{ wrap.classList.remove('has-media'); }
+  );
 }
 
 function renderTask(t){
@@ -1364,7 +1387,7 @@ function initPuzzleGame(t){
   const box = document.getElementById('taskInteractive');
   const wrap = document.createElement('div');
   wrap.className = 'puzzle-wrap';
-  wrap.style.backgroundImage = `url('${t.image}')`;
+  loadBackgroundWithFallback(wrap, t.image);
 
   const grid = document.createElement('div');
   grid.className = 'puzzle-grid';
@@ -1419,7 +1442,7 @@ const freezePoses = [
   "Раунд 2: замрите в позе, как на фото!",
   "Раунд 3: замрите в позе, как на фото!"
 ];
-const freezePoseImages = ["freeze-pose-1.jpg", "freeze-pose-2.jpg", "freeze-pose-3.jpg"];
+const freezePoseImages = ["freeze-pose-1", "freeze-pose-2", "freeze-pose-3"];
 
 function initFreezeGame(){
   const audio = document.getElementById('bgMusic');
@@ -1442,9 +1465,10 @@ function initFreezeGame(){
     const showPoseDelay = Math.max(delay - 3000, 0);
 
     setTimeout(()=>{
-      poseImg.onload = ()=>{ poseImg.classList.add('show'); };
-      poseImg.onerror = ()=>{ poseImg.classList.remove('show'); };
-      poseImg.src = freezePoseImages[round-1];
+      loadImageWithFallback(poseImg, freezePoseImages[round-1],
+        ()=>{ poseImg.classList.add('show'); },
+        ()=>{ poseImg.classList.remove('show'); }
+      );
     }, showPoseDelay);
 
     setTimeout(()=>{
