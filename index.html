@@ -566,6 +566,23 @@ body{
   font-weight:700;
   cursor:pointer;
 }
+.mic-btn-inline{
+  flex-shrink:0;
+  width:44px;
+  padding:0 !important;
+  border-radius:10px;
+  border:1px solid #3a3040 !important;
+  background:var(--bg2) !important;
+  font-size:17px;
+  cursor:pointer;
+  color:var(--white);
+}
+.mic-btn-inline.listening{
+  background:rgba(217,164,65,0.18) !important;
+  border-color:var(--gold) !important;
+  animation:micPulse 1s ease-in-out infinite;
+}
+.mic-btn-inline[disabled]{ opacity:0.35; cursor:not-allowed; }
 .puzzle-feedback{ margin-top:10px; font-size:13.5px; color:var(--muted); min-height:18px; }
 .puzzle-feedback.win{ color:var(--gold-bright); }
 
@@ -578,6 +595,17 @@ body{
   font-size:34px;
   margin:16px 0 20px;
 }
+.freeze-pose-img{
+  display:none;
+  width:100%;
+  max-width:260px;
+  margin:4px auto 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,216,115,0.3);
+  box-shadow:0 0 24px rgba(217,164,65,0.25);
+}
+.freeze-pose-img.show{ display:block; }
+
 .rhythm-round-label{
   text-align:center;
   color:var(--muted);
@@ -674,21 +702,28 @@ const CONFIG = {
 const tasks = [
   {
     tag: "ДОМА", tagClass:"",
-    title: "Танцы-Замри",
-    body: "Соберите всех гостей в круг! Нажмите «Включить музыку» — пока играет, все танцуют как хотят. Как только музыка сама остановится — замрите в позе по подсказке на экране, и сфотографируйте всех. Будет 3 раунда, и с каждым разом позы смешнее!",
-    type: "freeze"
+    title: "Праздничные шарики",
+    body: "Внутри шариков спрятаны кусочки слова. Лопни свой шарик и достань бумажку. Соберите все кусочки вместе и составьте из них слово. Когда получится слово, впишите его сюда.",
+    type: "wordinput",
+    answer: "праздник"
   },
   {
     tag: "ДОМА", tagClass:"",
     title: "Один блестящий",
-    body: "Легенда сцены всегда носила только ОДНУ блестящую перчатку. Всей командой найдите в доме что-то одно, блестящее и белое (перчатку, носок, украшение, фольгу — что угодно!) и наденьте на руку имениннику!",
+    body: "Легенда сцены носила одну блестящую перчатку. Найдите дома что-то одно блестящее и белое — перчатку, носок, украшение или фольгу. Наденьте это на руку имениннику и сделайте фото!",
     type: "photo",
     hint: "Нажми на рамку ниже, чтобы сфотографировать именинника в найденной «перчатке»."
   },
   {
     tag: "ДОМА", tagClass:"",
+    title: "Танцы-Замри",
+    body: "Соберите всех гостей в круг! Нажмите «Включить музыку» и танцуйте, как хотите. Как только музыка остановится сама, замрите в позе, которая появится на экране, и сфотографируйтесь все вместе. Всего будет 3 раунда — и с каждым разом позы будут всё смешнее!",
+    type: "freeze"
+  },
+  {
+    tag: "ДОМА", tagClass:"",
     title: "Угадай мультфильм",
-    body: "Под плитками спрятан кадр из мультфильма. Каждый ребёнок по очереди открывает одну плитку. Как только кто-то догадается, что это за мультфильм — вводите ответ ниже, не обязательно ждать, пока откроются все плитки!",
+    body: "Под плитками спрятался кадр из мультфильма. Каждый ребёнок по очереди открывает одну плитку. Как только догадаешься, что это за мультфильм, сразу же напиши ответ ниже, не жди, пока откроются все плитки!",
     type: "puzzle",
     image: "cartoon-puzzle.jpg",
     answer: "ну погоди"
@@ -708,18 +743,10 @@ const tasks = [
   },
   {
     tag: "ДОМА", tagClass:"",
-    title: "Праздничные шарики",
-    body: "Внутри нескольких шариков спрятаны бумажки с кусочками слова. Лопайте шарики по очереди — каждый ребёнок свой! Соберите все кусочки и сложите из них слово. Как только сложите — впишите его ниже.",
-    type: "wordinput",
-    answer: "праздник"
-  },
-  {
-    tag: "ДОМА", tagClass:"",
-    title: "Знаток звезды",
-    body: "Какой знаменитый танцевальный трюк умел делать Майкл Джексон — казалось, что он наклоняется вперёд сильнее, чем позволяет гравитация?",
-    type: "quiz",
-    options: ["Полёт", "Наклон против гравитации", "Шпагат", "Сальто"],
-    correct: 1
+    title: "Создай мумию",
+    body: "Разделитесь на пары. У каждой пары — рулон туалетной бумаги. По команде «Старт!» один обматывает другого, как мумию. Чья мумия самая смешная — та и победила! Сфотографируйте лучшую мумию.",
+    type: "photo",
+    hint: "Нажми на рамку ниже, чтобы сфотографировать мумию."
   },
   {
     tag: "ДОМА", tagClass:"",
@@ -740,7 +767,7 @@ const tasks = [
   {
     tag: "ДОМА", tagClass:"",
     title: "Ритм-код",
-    body: "Взрослый озвучивает ритм — хлопок или шаг по картинкам ниже, дети повторяют движения хором. Пройдите все 3 раунда, они становятся длиннее!",
+    body: "Прослушай ритм и повтори! Нажмите «Прослушать ритм». Пройдите все 5 раундов, они становятся длиннее!",
     type: "rhythm"
   },
   {
@@ -945,6 +972,7 @@ function renderTask(t){
     box.innerHTML = `
       <button class="btn btn-primary" id="freezeStartBtn" style="margin-bottom:14px;">Включить музыку</button>
       <div class="game-status" id="freezeStatus"></div>
+      <img id="freezePoseImg" class="freeze-pose-img" alt="">
       <div id="freezeCaptureArea"></div>
     `;
     initFreezeGame();
@@ -995,6 +1023,7 @@ function initSoundGuess(t){
 
   const input = answerRow.querySelector('#soundAnswerInput');
   const btn = answerRow.querySelector('#soundAnswerBtn');
+  attachVoiceInput(answerRow, input);
 
   function checkAnswer(){
     const val = normalizeAnswer(input.value);
@@ -1020,7 +1049,7 @@ const rhythmRounds = [
   ["👏","🦶","👏","🦶"],
   ["👏","👏","🦶","👏","🦶","🦶"],
   ["👏","🦶","👏","👏","🦶","🦶","👏","🦶"],
-  ["👏","👏","🦶","🦶","👏","🦶","👏","🦶","🦶","👏"]
+  ["🦶","🦶","🦶","🦶","🦶","🦶","🦶","🦶","🦶","🦶"]
 ];
 
 let rhythmAudioCtx = null;
@@ -1127,6 +1156,7 @@ function initWordInput(t){
 
   const input = answerRow.querySelector('#wordInputAnswer');
   const btn = answerRow.querySelector('#wordInputBtn');
+  attachVoiceInput(answerRow, input);
 
   function checkAnswer(){
     const val = normalizeAnswer(input.value);
@@ -1260,6 +1290,7 @@ function initRebusGame(t){
 
   const input = answerRow.querySelector('#rebusAnswerInput');
   const btn = answerRow.querySelector('#rebusAnswerBtn');
+  attachVoiceInput(answerRow, input);
 
   function checkAnswer(){
     const val = normalizeAnswer(input.value);
@@ -1280,6 +1311,48 @@ function initRebusGame(t){
 }
 
 /* ---- Угадай мультфильм: открывающиеся плитки + свободный ответ ---- */
+/* ---- Переиспользуемая кнопка голосового ввода для полей ответа ---- */
+function attachVoiceInput(row, input){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.createElement('button');
+  micBtn.type = 'button';
+  micBtn.className = 'mic-btn-inline';
+  micBtn.textContent = '🎤';
+  micBtn.title = 'Ответить голосом';
+  row.appendChild(micBtn);
+
+  if(!SpeechRec){
+    micBtn.disabled = true;
+    micBtn.title = 'Голосовой ввод не поддерживается этим браузером';
+    return;
+  }
+
+  const recognition = new SpeechRec();
+  recognition.lang = 'ru-RU';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  let listening = false;
+
+  micBtn.addEventListener('click', ()=>{
+    if(listening) return;
+    listening = true;
+    micBtn.classList.add('listening');
+    recognition.start();
+  });
+
+  recognition.onresult = (e)=>{
+    input.value = e.results[0][0].transcript.trim();
+  };
+  recognition.onerror = ()=>{
+    listening = false;
+    micBtn.classList.remove('listening');
+  };
+  recognition.onend = ()=>{
+    listening = false;
+    micBtn.classList.remove('listening');
+  };
+}
+
 function normalizeAnswer(str){
   return str.toLowerCase().replace(/[^а-яёa-z\s]/gi,'').replace(/\s+/g,'').trim();
 }
@@ -1316,6 +1389,7 @@ function initPuzzleGame(t){
 
   const input = row.querySelector('#puzzleAnswerInput');
   const btn = row.querySelector('#puzzleAnswerBtn');
+  attachVoiceInput(row, input);
 
   function checkAnswer(){
     const val = normalizeAnswer(input.value);
@@ -1338,27 +1412,38 @@ function initPuzzleGame(t){
 
 /* ---- Танцы-Замри: 3 раунда с музыкой и фото ---- */
 const freezePoses = [
-  "Раунд 1: замрите в САМОЙ смешной позе, какую только придумаете!",
-  "Раунд 2: замрите как супергерои, которых только что разбудили!",
-  "Раунд 3: замрите в позе самой яркой звезды сцены — софиты, поклон, эффектный жест!"
+  "Раунд 1: замрите в позе, как на фото!",
+  "Раунд 2: замрите в позе, как на фото!",
+  "Раунд 3: замрите в позе, как на фото!"
 ];
+const freezePoseImages = ["freeze-pose-1.jpg", "freeze-pose-2.jpg", "freeze-pose-3.jpg"];
 
 function initFreezeGame(){
   const audio = document.getElementById('bgMusic');
   const startBtn = document.getElementById('freezeStartBtn');
   const status = document.getElementById('freezeStatus');
   const captureArea = document.getElementById('freezeCaptureArea');
+  const poseImg = document.getElementById('freezePoseImg');
   let round = 0;
 
   function playRound(){
     round++;
     startBtn.style.display = 'none';
     captureArea.innerHTML = '';
+    poseImg.classList.remove('show');
     status.textContent = 'Музыка играет — танцуйте!';
     audio.currentTime = 0;
     audio.play().catch(()=>{ status.textContent = 'Не получилось включить трек — проверь, что файл музыки лежит рядом с квестом.'; });
 
-    const delay = 4000 + Math.random()*4000;
+    const delay = round === 1 ? 30000 : 4000 + Math.random()*4000;
+    const showPoseDelay = Math.max(delay - 3000, 0);
+
+    setTimeout(()=>{
+      poseImg.onload = ()=>{ poseImg.classList.add('show'); };
+      poseImg.onerror = ()=>{ poseImg.classList.remove('show'); };
+      poseImg.src = freezePoseImages[round-1];
+    }, showPoseDelay);
+
     setTimeout(()=>{
       audio.pause();
       status.textContent = freezePoses[round-1];
