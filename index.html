@@ -639,7 +639,7 @@ body{
   <!-- INTRO VIDEO (plays after name entry, before first task) -->
   <section class="screen" id="screen-intro-video">
     <div class="intro-video-wrap">
-      <video id="introVideo" src="intro-video.mp4" playsinline controls autoplay></video>
+      <video id="introVideo" src="intro-video.mp4" playsinline controls></video>
     </div>
     <button class="btn btn-primary" onclick="proceedToQuest()" style="margin:18px auto 0;">Далее →</button>
   </section>
@@ -826,6 +826,9 @@ function startQuest(){
   const val = document.getElementById('kidName').value.trim();
   if(val) kidName = val;
   showScreen('screen-intro-video');
+  const video = document.getElementById('introVideo');
+  video.currentTime = 0;
+  video.play().catch(()=>{});
 }
 
 function proceedToQuest(){
